@@ -2,6 +2,8 @@
 
 import sys
 
+# 
+
 class CPU:
     """Main CPU class."""
 
@@ -17,10 +19,13 @@ class CPU:
         # self.fl --> possibly to be used later
 
     def ram_read(self, MAR):
-        print(self.properties[MAR])
+        answer = self.properties[MAR]
+        print(answer)
+        return answer
 
     def ram_write(self, MAR, MDR):
         self.properties[MAR] = MDR
+        
 
     def load(self):
         """Load a program into memory."""
@@ -40,7 +45,7 @@ class CPU:
         ]
 
         for instruction in program:
-            self.ram[address] = instruction
+            self.properties[address] = instruction
             address += 1
 
 
@@ -75,4 +80,20 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
-        pass
+        # pass
+        IR = self.ram_read(self.pc)
+        operand_a = self.ram_read(self.pc + 1)
+        operand_b = self.ram_read(self.pc + 2)
+
+        if IR == 0b10000010:
+            print('hello')
+            self.pc += 2
+        elif IR == 0b01000111:
+            print('interesting')
+            self.pc += 1
+        elif IR == 0b00000001:
+            print('ohhhhh myyyyyyyy')
+            return
+        else:
+            print('what do?')
+
