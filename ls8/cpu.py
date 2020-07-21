@@ -79,6 +79,9 @@ class CPU:
         if op == "ADD":
             self.reg[reg_a] += self.reg[reg_b]
         #elif op == "SUB": etc
+        elif op == "MULT":
+            self.reg[reg_a] *= self.reg[reg_b]
+            print(self.reg[reg_a])
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -105,6 +108,7 @@ class CPU:
     def run(self):
         """Run the CPU."""
         # pass
+        self.trace()
         cont = True
 
         while cont:
@@ -120,6 +124,12 @@ class CPU:
                 # print('interesting')
                 self.PRN_Handler(operand_a)
                 self.pc += 1
+            elif IR == 0b10100000: # ADD
+                self.alu(operand_a, operand_b)
+            elif IR == 0b10100010: # MULT
+                self.alu("MULT", operand_a, operand_b)
+                # self.MULT_Handler(operand_a, operand_b)
+                # self.pc += 2
             elif IR == HLT:
                 # print('ohhhhh myyyyyyyy')
                 cont = False
@@ -132,8 +142,14 @@ class CPU:
     # Set the value of a register to an integer.
     def LDI_Handler(self, key, value):
         self.reg[key] = value
-        print(value, "LDI_Handler")
+        print(value, 'coming from here')
         
     # Print numeric value stored in the given register.
     def PRN_Handler(self, value):
-        print(self.reg[value], 'PRN_Handler')
+        print(self.reg[value])
+
+    # def MULT_Handler(self, val1, val2):
+    #     total = val1 * val2
+    #     self.reg[val1] *= self.reg[val2]
+    #     print(self.reg[val1], 'total')
+    #     # return total
