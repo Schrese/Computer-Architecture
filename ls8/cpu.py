@@ -38,19 +38,39 @@ class CPU:
 
         # For now, we've just hardcoded a program:
 
-        program = [
-            # From print8.ls8
-            0b10000010, # LDI R0,8
-            0b00000000,
-            0b00001000,
-            0b01000111, # PRN R0
-            0b00000000,
-            0b00000001, # HLT
-        ]
+        # program = [
+        #     # From print8.ls8
+        #     0b10000010, # LDI R0,8
+        #     0b00000000,
+        #     0b00001000,
+        #     0b01000111, # PRN R0
+        #     0b00000000,
+        #     0b00000001, # HLT
+        # ]
 
-        for instruction in program:
-            self.properties[address] = instruction
-            address += 1
+        # for instruction in program:
+        #     self.properties[address] = instruction
+        #     address += 1
+
+        # with open('examples/print8.ls8', 'r') as f:
+        # self.trace()
+        if len(sys.argv) != 2:
+            print("usage: python3 ls8.py examples/filename")
+            sys.exit(1)
+        # print(sys.argv[1])
+        try:
+            with open(sys.argv[1]) as f:
+                for instruction in f:
+                    try:
+                        instruction = instruction.split("#", 1)[0]
+                        instruction = int(instruction, 2)
+                        self.properties[address] = instruction
+                        address += 1
+                    except ValueError: 
+                        pass
+        except FileNotFoundError:
+            print(f"Couldn't find file {sys.argv[1]}")
+            sys.exit(1)
 
 
     def alu(self, op, reg_a, reg_b):
@@ -93,15 +113,15 @@ class CPU:
             operand_b = self.ram_read(self.pc + 2)
 
             if IR == 0b10000010: #LDI
-                print('hello')
+                # print('hello')
                 self.LDI_Handler(operand_a, operand_b)
                 self.pc += 2
             elif IR == 0b01000111: # PRN
-                print('interesting')
+                # print('interesting')
                 self.PRN_Handler(operand_a)
                 self.pc += 1
             elif IR == HLT:
-                print('ohhhhh myyyyyyyy')
+                # print('ohhhhh myyyyyyyy')
                 cont = False
                 # sys.exit(1)
                 # return
