@@ -11,6 +11,7 @@ PUSH = 0b01000101
 POP = 0b01000110
 CALL = 0b01010000
 RET = 0b00010001
+ADD = 0b10100000
 
 class CPU:
     """Main CPU class."""
@@ -23,7 +24,6 @@ class CPU:
         self.pc = 0 # ---> program counter
         self.sp = 0xF4 # --> Stack Pointer
         self.ir = 0
-
 
     def ram_read(self, MAR):
         answer = self.properties[MAR]
@@ -82,10 +82,11 @@ class CPU:
 
         if op == "ADD":
             self.reg[reg_a] += self.reg[reg_b]
+            # print(self.reg[reg_a])
         #elif op == "SUB": etc
         elif op == "MULT":
             self.reg[reg_a] *= self.reg[reg_b]
-            print(self.reg[reg_a])
+            # print(self.reg[reg_a])
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -112,7 +113,7 @@ class CPU:
     def run(self):
         """Run the CPU."""
         # pass
-        # self.trace()
+        self.trace()
         cont = True
 
         while cont:
@@ -128,12 +129,13 @@ class CPU:
                 # print('interesting')
                 self.PRN_Handler(operand_a)
                 self.pc += 2
-            # elif IR == 0b10100000: # ADD
-            #     self.alu("ADD", operand_a, operand_b)
+            elif IR == ADD: # ADD
+                self.alu("ADD", operand_a, operand_b)
+                self.pc += 3
             elif IR == MULT: # MULT
-                self.alu("MULT", self.pc + 1, self.pc + 2)
+                self.alu("MULT", operand_a, operand_b)
                 # self.MULT_Handler(operand_a, operand_b)
-                self.pc += 2
+                self.pc += 3
             elif IR == PUSH:
                 # self.sp -=1 # Moves the pointer down/decrements it
                 registry_address = self.ram_read(self.pc + 1)
@@ -145,14 +147,10 @@ class CPU:
                 registry_address = self.ram_read(self.pc + 1)
                 self.reg[registry_address] = value
                 self.pc += 2
-            elif IR == HLT:
-                # print('ohhhhh myyyyyyyy')
-                cont = False
-                # sys.exit(1)
-                # return
             elif IR == CALL:
                 # pass
-                self.reg[self.pc] -= 1
+                # print('made it to call')
+                self.reg[7] -= 1 # ---> stack pointer wasn't pointing at the right place, but only for this function. 
                 self.PUSH_Handler(self.pc + 2)
 
                 reg_num = self.properties[self.pc + 1]
@@ -162,10 +160,18 @@ class CPU:
 
             elif IR == RET:
                 # pass
-                return_addr = self.POP_Handler(self.pc + 1)
-                self.reg[self.sp] += 1
+                value = self.POP_Handler()
+                registry_address = self.ram_read(self.pc + 1)
+                self.reg[registry_address] = value
+                self.pc = value
+            elif IR == HLT:
+                # print('ohhhhh myyyyyyyy')
+                cont = False
+                # sys.exit(1)
+                # return
             else:
                 print('what do?')
+            # print(self.pc, self.sp, "I'm PC Bro!")
 
     # Set the value of a register to an integer.
     def LDI_Handler(self, key, value):
