@@ -13,6 +13,9 @@ CALL = 0b01010000
 RET = 0b00010001
 ADD = 0b10100000
 CMP = 0b10100111
+JMP = 0b01010100
+JEQ = 0b01010101
+JNE = 0b01010110
 
 class CPU:
     """Main CPU class."""
@@ -90,6 +93,7 @@ class CPU:
             self.reg[reg_a] *= self.reg[reg_b]
             # print(self.reg[reg_a])
         elif op == "CMP":
+            print(reg_a, reg_b)
             if self.reg[reg_a] == self.reg[reg_b]:
                 self.equal_flag = 0b00000001
             else:
@@ -171,8 +175,28 @@ class CPU:
                 self.pc = value
             elif IR == CMP: 
                 # pass
-                self.alu("CMP", operand_a, operand_b)
-                self.pc += 3
+                # self.reg[7] -= 1
+                reg_one = self.properties[self.pc + 1]
+                reg_two = self.properties[self.pc + 2]
+                self.alu("CMP", reg_one, reg_two)
+                self.pc += 2
+            elif IR == JMP:
+                reg_one = self.properties[self.pc + 1]
+                self.JMP_Handler(reg_one)
+            elif IR == JEQ:
+                print(self.pc, 'hello')
+                registry_address = self.properties[self.pc + 1]
+
+                if self.equal_flag == 1:
+                    self.JMP_Handler(self.reg[registry_address])
+                else:
+                    self.pc += 2
+            elif IR == JNE: 
+                # pass
+                if self.equal_flag == 0:
+                    self.JMP_Handler(operand_a)
+                else:
+                    self.pc += 1
             elif IR == HLT:
                 # print('ohhhhh myyyyyyyy')
                 cont = False
@@ -180,7 +204,7 @@ class CPU:
                 # return
             else:
                 print('what do?')
-            print(self.pc, self.sp, "I'm PC Bro!")
+            print(self.pc, self.sp, self.equal_flag, "I'm PC Bro!")
 
     # Set the value of a register to an integer.
     def LDI_Handler(self, key, value):
@@ -204,6 +228,10 @@ class CPU:
         else:
             print("Error: stack is empty")
             cont = False    
+
+    def JMP_Handler(self, register):
+        self.pc = register
+        print(self.pc)
 
     def CALL_Handler(self):
         pass
