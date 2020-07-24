@@ -12,6 +12,7 @@ POP = 0b01000110
 CALL = 0b01010000
 RET = 0b00010001
 ADD = 0b10100000
+CMP = 0b10100111
 
 class CPU:
     """Main CPU class."""
@@ -24,6 +25,7 @@ class CPU:
         self.pc = 0 # ---> program counter
         self.sp = 0xF4 # --> Stack Pointer
         self.ir = 0
+        self.equal_flag = 0b00000000
 
     def ram_read(self, MAR):
         answer = self.properties[MAR]
@@ -87,6 +89,11 @@ class CPU:
         elif op == "MULT":
             self.reg[reg_a] *= self.reg[reg_b]
             # print(self.reg[reg_a])
+        elif op == "CMP":
+            if self.reg[reg_a] == self.reg[reg_b]:
+                self.equal_flag = 0b00000001
+            else:
+                self.equal_flag = 0b00000000
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -134,7 +141,6 @@ class CPU:
                 self.pc += 3
             elif IR == MULT: # MULT
                 self.alu("MULT", operand_a, operand_b)
-                # self.MULT_Handler(operand_a, operand_b)
                 self.pc += 3
             elif IR == PUSH:
                 # self.sp -=1 # Moves the pointer down/decrements it
@@ -157,13 +163,16 @@ class CPU:
                 subroutine_addr = self.reg[reg_num]
 
                 self.pc = subroutine_addr
-
             elif IR == RET:
                 # pass
                 value = self.POP_Handler()
                 registry_address = self.ram_read(self.pc + 1)
                 self.reg[registry_address] = value
                 self.pc = value
+            elif IR == CMP: 
+                # pass
+                self.alu("CMP", operand_a, operand_b)
+                self.pc += 3
             elif IR == HLT:
                 # print('ohhhhh myyyyyyyy')
                 cont = False
@@ -171,7 +180,7 @@ class CPU:
                 # return
             else:
                 print('what do?')
-            # print(self.pc, self.sp, "I'm PC Bro!")
+            print(self.pc, self.sp, "I'm PC Bro!")
 
     # Set the value of a register to an integer.
     def LDI_Handler(self, key, value):
@@ -182,11 +191,6 @@ class CPU:
     def PRN_Handler(self, value):
         print(self.reg[value])
 
-    # def MULT_Handler(self, val1, val2):
-    #     total = val1 * val2
-    #     self.reg[val1] *= self.reg[val2]
-    #     print(self.reg[val1], 'total')
-    #     # return total
     def PUSH_Handler(self, v):
         self.sp -=1 
         self.ram_write(self.sp, v)
