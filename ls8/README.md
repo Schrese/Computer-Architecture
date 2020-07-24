@@ -60,6 +60,13 @@ but you'll have to implement those three above instructions first!
 ## Step 0: IMPORTANT: inventory what is here!
 
 * Make a list of files here.
+  - Main readme- Instructions for this week
+  - FAQ.md - includes some instructions, some definitions, and hints
+  - LS8-cheatsheet.md - includes operations for some of the definitions in the spec. Note: should anything differ in the spec, the spec is to be used
+  - LS8-spec.md - Documentation (the main source)
+  - Examples(lots of files) - examples of the functiosn we will need to write?
+  - cpu.py - This is the CPU class. Looks like I need to implement "run" and "__init__", since "trace" and "alu" are already done. It also looks like I will need to change/improve "load"
+  - ls8.py - uses CPU class to create a new instance. 
 * Write a short 3-10-word description of what each file does.
 * Note what has been implemented, and what hasn't.
 * Read this whole file.
