@@ -93,7 +93,7 @@ class CPU:
             self.reg[reg_a] *= self.reg[reg_b]
             # print(self.reg[reg_a])
         elif op == "CMP":
-            print(reg_a, reg_b)
+            # print(reg_a, reg_b)
             if self.reg[reg_a] == self.reg[reg_b]:
                 self.equal_flag = 0b00000001
             else:
@@ -175,16 +175,16 @@ class CPU:
                 self.pc = value
             elif IR == CMP: 
                 # pass
-                # self.reg[7] -= 1
                 reg_one = self.properties[self.pc + 1]
                 reg_two = self.properties[self.pc + 2]
                 self.alu("CMP", reg_one, reg_two)
-                self.pc += 2
+                self.pc += 3
             elif IR == JMP:
+                # print(self.pc, "JMP")
                 reg_one = self.properties[self.pc + 1]
-                self.JMP_Handler(reg_one)
+                self.JMP_Handler(self.reg[reg_one])
             elif IR == JEQ:
-                print(self.pc, 'hello')
+                # print(self.pc, "JEQ")
                 registry_address = self.properties[self.pc + 1]
 
                 if self.equal_flag == 1:
@@ -192,19 +192,22 @@ class CPU:
                 else:
                     self.pc += 2
             elif IR == JNE: 
+                # print(self.pc, "JNE")
+                registry_address = self.properties[self.pc + 1]
                 # pass
                 if self.equal_flag == 0:
-                    self.JMP_Handler(operand_a)
+                    self.JMP_Handler(self.reg[registry_address])
                 else:
-                    self.pc += 1
+                    self.pc += 2
             elif IR == HLT:
                 # print('ohhhhh myyyyyyyy')
                 cont = False
                 # sys.exit(1)
                 # return
             else:
-                print('what do?')
-            print(self.pc, self.sp, self.equal_flag, "I'm PC Bro!")
+                print('what do?', self.pc)
+                cont = False
+            # print(self.pc, self.sp, self.equal_flag, "I'm PC Bro!")
 
     # Set the value of a register to an integer.
     def LDI_Handler(self, key, value):
@@ -229,9 +232,9 @@ class CPU:
             print("Error: stack is empty")
             cont = False    
 
-    def JMP_Handler(self, register):
-        self.pc = register
-        print(self.pc)
+    def JMP_Handler(self, address):
+        self.pc = address
+        # print(self.pc)
 
     def CALL_Handler(self):
         pass
